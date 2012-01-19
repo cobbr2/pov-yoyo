@@ -1,0 +1,30 @@
+Trying to get to a task list, still brainstorming....
+* Translate rgbike algorithm to Arduino and test on breadboard
+* Figure on having to sample the accelerometer on each loop
+    * Will need some filtering of some sort, can a Kalman do it?
+        * Want to detect:
+            * Average g => current cycle/second count based on accelerometer
+            * Cycle # and Maximum g per rotation => "from" (surrogate for "down")
+            * Cycle # and Minimum g per rotation => "to" (surrogate for "up")
+            * Assume that min g ~ max g ~ avg g > 1 => spinning in freefall
+            * Use diff g to change program
+            * Sync image to max g if max g >~ 2 + min g (i.e., the image is oriented to "from")
+            * max g ~ min g <= 1 over 30ms => stopped, off-axis.
+
+        * Model is probably simplistic, but let's go with at most the above for the first try. Things I think are problematic:
+            * Excalibur-style (near-vertical axis of rotation): Model above implies freefall, dead reckons from last "from".
+            * Sync could just be to avg g.
+            * How much filtering will the sensor need? Sync is based on "max", so I presume a low-pass (1D Kalman?) filter will do for that... but without measurements recorded, it's hard to tell.
+    * Any point in coding before the sensors get here? Probably not.
+
+* Additional sensor
+    * Stage-direction ("down") sensor: current idea is UV photodiode, but nothing found that fits. UV LED decay rate capture might work, but sensitivity seems like a problem.
+    * Two sensors mean chance to really apply Kalman, but need my state model.
+
+    * Idea for state model:
+        v       => Estimated rotational velocity
+        f       => Direction of "from", 1 polar measurement, discretized into 64 slots? (64 * 8 LEDs => 512 pixels resolution => ~ 24x24 square pixels)
+
+        f(t+1) = f(t) + v*interval
+
+* 
